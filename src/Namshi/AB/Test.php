@@ -19,19 +19,19 @@ class Test implements Countable
     protected $parameters   = array();
     protected $seed;
     protected $sumVariations = 0;
-    
+
     const ERROR_TEST_RAN_WITHOUT_VARIATIONS         = "You are trying to run a test without specifying its variations";
     const ERROR_GET_VARIATION_BEFORE_RUNNING_TEST   = "You must run() the test before getting its variation";
-    
+
     /**
      * Creates a test with the given $name and the specified $variations.
-     * 
+     *
      * Variations must have an absolute value, not a percentage; for example,
      * - a: 100
      * - b: 100
-     * 
+     *
      * means that both variations have 50% of probability.
-     * 
+     *
      * @param string $name
      * @param array $variations
      * @param array $parameters
@@ -42,10 +42,10 @@ class Test implements Countable
         $this->setVariations($variations);
         $this->setParameters($parameters);
     }
-    
+
     /**
      * Returns the name of the test.
-     * 
+     *
      * @return string
      */
     public function getName()
@@ -55,27 +55,27 @@ class Test implements Countable
 
     /**
      * Sets the test's $name.
-     * 
+     *
      * @param string $name
      */
     public function setName($name)
     {
         $this->name = $name;
     }
-    
+
     /**
      * Returns how many variations the test contains.
-     * 
+     *
      * @return int
      */
-    public function count()
+    public function count(): int
     {
         return count($this->variations);
     }
-    
+
     /**
      * Returns the variations of this test.
-     * 
+     *
      * @return array
      */
     public function getVariations()
@@ -85,7 +85,7 @@ class Test implements Countable
 
     /**
      * Sets the $variations of this test.
-     * 
+     *
      * @param array $variations
      */
     public function setVariations(array $variations)
@@ -107,7 +107,7 @@ class Test implements Countable
 
     /**
      * Gets the seed for this test.
-     * 
+     *
      * @return int
      */
     public function getSeed()
@@ -117,7 +117,7 @@ class Test implements Countable
 
     /**
      * Sets the seed for this test.
-     * 
+     *
      * @param int $seed
      */
     public function setSeed($seed)
@@ -126,7 +126,7 @@ class Test implements Countable
             $this->seed = (int) $seed;
         }
     }
-    
+
     /**
      * Disables the test: this is useful when, for example, you want to exclude
      * this test to run for specific request (for example, bots).
@@ -135,10 +135,10 @@ class Test implements Countable
     {
         $this->isEnabled = false;
     }
-    
+
     /**
      * Checks whether the test is enabled or not.
-     * 
+     *
      * @return bool
      */
     public function isEnabled()
@@ -148,30 +148,30 @@ class Test implements Countable
 
     /**
      * Checks whether the test is disabled or not.
-     * 
+     *
      * @return bool
      */
     public function isDisabled()
     {
         return !$this->isEnabled();
     }
-    
+
     /**
      * Returns the variation of this test.
-     * 
-     * You must run the test before getting the variation, else a 
+     *
+     * You must run the test before getting the variation, else a
      * BadMethodCallException is thrown.
      * If the test is disabled, the first variation will always be returned,
      * even if its odd is set to 0.
-     * 
+     *
      * @return string
      */
     public function getVariation()
-    {        
+    {
         if (!$this->hasRun()) {
             $this->run();
         }
-        
+
         if ($this->isDisabled()) {
             $variations = array_keys($this->getVariations());
 
@@ -180,10 +180,10 @@ class Test implements Countable
 
         return $this->variation;
     }
-    
+
     /**
      * Checks whether the test has run or not.
-     * 
+     *
      * @param bool $ran
      * @return bool
      */
@@ -192,13 +192,13 @@ class Test implements Countable
         if (!is_null($ran)) {
             $this->hasRun = (bool) $ran;
         }
-        
+
         return (bool) $this->hasRun;
     }
-    
+
     /**
      * Gets the parameters for this test.
-     * 
+     *
      * @return array
      */
     public function getParameters()
@@ -208,17 +208,17 @@ class Test implements Countable
 
     /**
      * Sets the parameters for this test.
-     * 
+     *
      * @param array $parameters
      */
     public function setParameters(array $parameters)
     {
         $this->parameters = $parameters;
     }
-    
+
     /**
      * Returns a test's parameter.
-     * 
+     *
      * @param string $parameter
      * @return mixed
      */
@@ -228,10 +228,10 @@ class Test implements Countable
             return $this->parameters[$parameter];
         }
     }
-    
+
     /**
      * Returns a test's parameter.
-     * 
+     *
      * @param string $parameter
      * @param mixed $value
      */
@@ -239,7 +239,7 @@ class Test implements Countable
     {
         $this->parameters[$parameter] = $value;
     }
-    
+
     /**
      * Runs the test.
      */
@@ -248,15 +248,15 @@ class Test implements Countable
         if (!$this->count()) {
             throw new BadMethodCallException(self::ERROR_TEST_RAN_WITHOUT_VARIATIONS);
         }
-        
+
         $this->hasRun(true);
         $this->calculateVariation();
     }
-    
+
     /**
      * Validates an array of variations.
      * All the variations must have an integer value.
-     * 
+     *
      * @param array $variations
      * @throws InvalidArgumentException
      */
@@ -268,7 +268,7 @@ class Test implements Countable
             }
         });
     }
-    
+
     /**
      * Calculates the variation of this test.
      */
@@ -280,13 +280,13 @@ class Test implements Countable
 
         $sum    = 0;
         $random = mt_rand(1, $this->getSumVariations());
-        
+
         foreach ($this->getVariations() as $variation => $odd) {
             $sum += $odd;
-            
+
             if($random <= $sum) {
                 $this->variation = $variation;
-                
+
                 return;
             }
         }
